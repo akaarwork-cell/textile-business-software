@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#f7f8f6">
+<title>Vastra — Textile Business OS</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#f7f8f6;--card:#fff;--ink:#171a18;--muted:#737a75;--line:#e5e8e5;--soft:#eef2ef;--brand:#173d32;--brand2:#dce9e2;--warn:#8b641e;--warnbg:#f8efd9;--red:#a94343;--redbg:#f8e8e8;--shadow:0 10px 35px rgba(20,30,25,.06);--r:19px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;touch-action:manipulation;overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Arial,sans-serif;font-size:14px;overflow-x:hidden}
+button,input,select,textarea{font:inherit}button{cursor:pointer;touch-action:manipulation}button:active{transform:scale(.985)}
+.hidden{display:none!important}
+button,input,select,textarea{outline:none}
+
+/* owner shell */
+.side{position:fixed;z-index:20;left:0;top:0;bottom:0;width:230px;background:#101814;color:#fff;padding:24px 14px;display:flex;flex-direction:column}
+.logo{font-size:22px;font-weight:800;letter-spacing:-.8px;padding:2px 13px 27px}.logo i{font-style:normal;color:#9ac5b2}
+.nav{display:grid;gap:4px}.nav button{border:0;background:transparent;color:#aeb9b2;text-align:left;padding:12px 13px;border-radius:12px}.nav button.active,.nav button:hover{background:#20352b;color:#fff}.nav button span{display:inline-block;width:27px}
+.sidefoot{margin-top:auto;border-top:1px solid #28352f;padding:16px 13px;color:#aeb9b2;font-size:11px;line-height:1.5}.sidefoot b{display:block;color:#fff;font-size:13px}
+main{margin-left:230px;width:calc(100% - 230px);max-width:1450px;padding:25px 32px 70px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.date{font-size:12px;color:var(--muted)}h1{font-size:26px;letter-spacing:-1px;margin:4px 0 0}h2{font-size:21px;letter-spacing:-.5px;margin:0}h3{font-size:14px;margin:0}
+.actions{display:flex;gap:8px}.btn{background:#fff;border:1px solid var(--line);color:var(--ink);padding:10px 14px;border-radius:11px;font-size:12px}.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}.btn.small{padding:7px 10px;font-size:11px}
+.page{display:none}.page.active{display:block}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.stat{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}.label{color:var(--muted);font-size:11px}.value{font-size:24px;font-weight:750;letter-spacing:-.7px;margin-top:8px}.sub{font-size:10px;color:#3b8063;margin-top:6px}.sub.warn{color:var(--warn)}
+.two{display:grid;grid-template-columns:1.45fr 1fr;gap:15px;margin-top:15px}.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}.head{display:flex;justify-content:space-between;align-items:center;padding:18px 19px 13px}.head span{font-size:11px;color:var(--muted)}
+table{width:100%;border-collapse:collapse}th,td{padding:12px 19px;border-top:1px solid var(--line);text-align:left;font-size:11px}th{color:var(--muted);font-weight:500;font-size:10px}
+.pill{display:inline-flex;padding:4px 7px;border-radius:99px;background:var(--soft);font-size:9px}.pill.green{color:#28684f;background:#e7f2eb}.pill.warn{color:var(--warn);background:var(--warnbg)}.pill.red{color:var(--red);background:var(--redbg)}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 19px 19px}.quick button{border:1px solid var(--line);background:#f8f9f7;border-radius:14px;padding:14px;text-align:left}.quick b{display:block;font-size:12px}.quick small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.notice{margin-top:15px;padding:16px 18px;border:1px solid var(--line);background:#fff;border-radius:16px;display:flex;justify-content:space-between;align-items:center;gap:12px}.notice p{margin:4px 0 0;color:var(--muted);font-size:11px}
+.banner{display:flex;justify-content:space-between;align-items:center;background:var(--brand);color:#fff;border-radius:var(--r);padding:19px 21px;margin-bottom:15px;gap:12px}.banner p{color:#cbdad3;margin:5px 0 0;font-size:11px}.banner .btn{background:#fff;border-color:#fff;color:var(--brand)}
+.toolbar{display:flex;gap:8px;margin-bottom:13px}.search{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 13px;outline:none;font-size:12px}
+.products{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.product{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:#fff}.product img{width:100%;height:180px;object-fit:cover;display:block;background:#eef1ee}.product .body{padding:12px}.product h4{margin:0;font-size:12px}.product p{margin:4px 0 9px;color:var(--muted);font-size:10px}.bottom{display:flex;justify-content:space-between;align-items:center;gap:6px}.price{font-weight:700;font-size:12px}.qty{display:flex;align-items:center;border:1px solid var(--line);border-radius:9px;overflow:hidden}.qty button{background:#fff;border:0;width:27px;height:27px}.qty span{min-width:25px;text-align:center;font-size:11px}
+.rows{display:grid;gap:9px}.row{background:#fff;border:1px solid var(--line);border-radius:15px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}.row strong{font-size:12px}.row small{display:block;color:var(--muted);font-size:10px;margin-top:4px}.right{display:flex;gap:9px;align-items:center}
+.gstgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.gstbox{padding:18px}.gstbox .value{font-size:22px}
+.upload{background:#fff;border:1px solid var(--line);border-radius:17px;padding:16px;margin-bottom:14px}.uploadgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.uploadgrid .full{grid-column:1/-1}.field label{display:block;color:var(--muted);font-size:9px;margin-bottom:5px}.field input,.field select,.field textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.filebox{border:1px dashed #cfd5d1;padding:15px;border-radius:12px;text-align:center;font-size:10px;color:var(--muted)}.filebox input{display:none}
+.orderCard{background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px 16px}.orderTop{display:flex;justify-content:space-between;gap:10px}.orderItems{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:10px;color:var(--muted);line-height:1.7}.orderFooter{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.empty{padding:50px;text-align:center;color:var(--muted)}
+
+/* modal / bill */
+.modalback{position:fixed;inset:0;background:rgba(9,16,13,.5);z-index:60;display:none;align-items:flex-end;justify-content:center}.modal{width:min(720px,100%);background:#fff;border-radius:25px 25px 0 0;padding:22px 20px 25px;max-height:92vh;overflow:auto}.modal h2{font-size:19px}.modal p{color:var(--muted);font-size:11px;margin:5px 0 0}.fields{display:grid;gap:11px;margin:18px 0}.modalfoot{display:flex;justify-content:flex-end;gap:8px}
+.billRows{display:grid;gap:8px;margin:15px 0}.billRow{display:grid;grid-template-columns:minmax(0,1.6fr) .55fr .7fr .75fr 32px;gap:7px;align-items:end}.billRow .remove{height:38px;width:32px;border:1px solid var(--line);background:#fff;border-radius:9px;color:var(--red)}
+.billRow input{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font-size:11px}.billLabel{font-size:8px;color:var(--muted);margin:0 0 4px}
+.invoice{border:1px solid #ddd;padding:20px;background:#fff;color:#111}.invoiceTop{display:flex;justify-content:space-between;border-bottom:2px solid #111;padding-bottom:14px}.invoice h3{font-size:18px}.tiny{font-size:9px;color:#555}.invoice table th,.invoice table td{padding:8px;border-color:#ddd}.invoiceTotal{margin-left:auto;width:220px;margin-top:10px}.invoiceTotal div{display:flex;justify-content:space-between;padding:4px;font-size:11px}.invoiceTotal .grand{font-weight:800;border-top:1px solid #111;margin-top:4px;padding-top:8px}
+.toast{position:fixed;right:18px;bottom:18px;z-index:100;background:#13221c;color:#fff;padding:12px 15px;border-radius:12px;font-size:11px;display:none}
+
+/* client */
+#clientApp{min-height:100vh}.client{max-width:760px;margin:auto;padding:18px 15px 100px}.clientTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.clientTop b{font-size:20px;letter-spacing:-.7px}.clientTop span{font-size:10px;color:var(--muted)}.clientSwitch{position:fixed;right:12px;top:10px;z-index:80;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:10px;box-shadow:var(--shadow)}
+.welcome{background:var(--brand);color:#fff;border-radius:20px;padding:21px;margin-bottom:14px}.welcome h2{font-size:22px;letter-spacing:-.8px}.welcome p{font-size:11px;color:#cadbd3;margin:6px 0 0}.gate{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:16px}.gate p{font-size:11px;color:var(--muted);margin:0 0 10px}.gategrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gate input{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px}.gate input:last-of-type{grid-column:1/-1}.gate button{grid-column:1/-1;background:var(--brand);color:#fff;border:0;padding:11px;border-radius:10px}.cats{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 15px;padding-bottom:2px}.cats button{white-space:nowrap;background:#fff;border:1px solid var(--line);border-radius:99px;padding:8px 12px;font-size:10px}.cats button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.clientProducts{display:grid;grid-template-columns:1fr 1fr;gap:10px}.clientProduct{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}.clientProduct img{width:100%;height:190px;object-fit:cover;display:block;background:#eef1ee}.clientProduct .body{padding:11px}.clientProduct .body b{font-size:12px}.clientProduct .body p{font-size:10px;color:var(--muted);margin:4px 0 8px}
+.clientCart{position:fixed;left:50%;transform:translateX(-50%);bottom:15px;width:min(720px,calc(100% - 30px));background:var(--brand);color:#fff;border-radius:14px;padding:13px 15px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 15px 35px #0002;z-index:30}.clientCart small{display:block;color:#cbdad3}.clientCart button{border:0;background:#fff;color:var(--brand);border-radius:9px;padding:9px 12px;font-size:11px}
+.cartModal{position:fixed;inset:0;background:#fff;display:none;z-index:90;padding:20px 15px;overflow:auto}.cartModal.show{display:block}.line{border-top:1px solid var(--line);padding:12px 0;display:flex;justify-content:space-between;font-size:11px;gap:12px}.close{border:1px solid var(--line);background:#fff;padding:10px 14px;border-radius:10px}.place{background:var(--brand);color:#fff;border:0;padding:12px 15px;border-radius:11px;width:100%;margin-top:12px}
+.mobilebar{display:none}
+
+/* prevent horizontal layouts on phones */
+@media(max-width:900px){.side{width:72px;padding:18px 9px}.logo{font-size:0;text-align:center;padding:2px 0 24px}.logo:after{content:"V";font-size:22px}.nav button{font-size:0;text-align:center}.nav button span{width:auto;font-size:17px}.sidefoot{display:none}main{margin-left:72px;width:calc(100% - 72px);padding:20px}.stats{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}.products{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){
+body{padding-bottom:68px}.side{display:none}main{margin:0;width:100%;padding:16px 14px 30px}.top{margin-bottom:18px}.date{font-size:10px}h1{font-size:20px}.actions .btn:first-child{display:none}.stats{gap:8px}.stat{padding:14px}.value{font-size:20px}.two{gap:10px}.card{border-radius:17px}.head{padding:15px}.quick{padding:0 15px 15px}.products{gap:9px}.product img{height:150px}.banner{padding:16px;border-radius:17px}.banner h2{font-size:18px}.banner p{font-size:10px}.gstgrid{grid-template-columns:1fr}.mobilebar{position:fixed;display:flex;z-index:25;bottom:0;left:0;right:0;height:62px;background:rgba(255,255,255,.96);border-top:1px solid var(--line);justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom));backdrop-filter:blur(12px)}.mobilebar button{border:0;background:none;color:#777;font-size:9px}.mobilebar button b{display:block;font-size:17px;margin-bottom:2px}.mobilebar button.active{color:var(--brand)}
+.uploadgrid{grid-template-columns:1fr}.uploadgrid .full{grid-column:auto}.billRow{grid-template-columns:minmax(0,1fr) .7fr .8fr 32px}.billRow .amountField{grid-column:3}.billRow .rateField{grid-column:2}.billRow .remove{grid-column:4;grid-row:1 / span 2}.billRow .particularField{grid-column:1 / span 3}.billRow .qtyField{grid-column:1}.billRow .rateField{grid-column:2}.billRow .amountField{grid-column:3}
+table{display:none}.mobileTable{display:grid}.notice{align-items:flex-start}.notice .btn{flex:none}.client{padding:15px 13px 100px}.clientProduct img{height:155px}.gategrid{grid-template-columns:1fr}.gate input:last-of-type{grid-column:auto}.gate button{grid-column:1/-1}.clientTop{margin-top:20px}.clientSwitch{top:7px;right:7px}
+}
+@media(min-width:601px){.mobileTable{display:none}}
+@media print{body *{visibility:hidden!important}.invoice,.invoice *{visibility:visible!important}.invoice{position:absolute;left:0;top:0;width:100%;border:0}.modalback{display:block!important;background:#fff}}
+
+/* PREMIUM ENTRY SCREEN */
+#entry{min-height:100svh;background:radial-gradient(circle at 50% 5%,#dce9e2 0,transparent 34%),linear-gradient(145deg,#fafbf9,#edf1ee);display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden;position:relative}
+.entryGlow{position:absolute;width:420px;height:420px;border-radius:50%;background:rgba(23,61,50,.07);filter:blur(2px);top:-250px;right:-150px}.entryInner{width:min(680px,100%);text-align:center;position:relative;z-index:2}.entryBrand{font-size:38px;font-weight:850;letter-spacing:-2px}.entryBrand i{color:#173d32;font-style:normal}.entryKicker{margin-top:7px;color:#7a837d;font-size:9px;letter-spacing:3px;text-transform:uppercase}.entryTitle{font-size:clamp(34px,7vw,57px);line-height:.98;letter-spacing:-2.6px;margin:42px auto 14px;font-weight:800}.entrySub{max-width:430px;margin:0 auto 34px;color:#747c76;font-size:11px;line-height:1.6}.entryChoices{display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left}.entryChoice{min-height:185px;border:1px solid rgba(23,61,50,.13);background:rgba(255,255,255,.72);backdrop-filter:blur(20px);border-radius:24px;padding:22px;box-shadow:0 22px 65px rgba(23,40,32,.09);position:relative;overflow:hidden;transition:.2s}.entryChoice:hover{transform:translateY(-4px);box-shadow:0 30px 80px rgba(23,40,32,.14)}.entryChoice:after{content:"";position:absolute;width:125px;height:125px;border-radius:50%;background:rgba(23,61,50,.06);right:-48px;top:-48px}.entryIcon{width:40px;height:40px;border-radius:12px;background:#173d32;color:#fff;display:grid;place-items:center;font-size:18px;margin-bottom:30px}.entryChoice h2{font-size:18px;margin:0 0 5px}.entryChoice p{font-size:10px;color:#747c76;line-height:1.5;margin:0}.entryArrow{position:absolute;right:20px;bottom:17px;color:#173d32;font-size:18px}.entryFoot{font-size:9px;color:#929994;margin-top:20px}.detailLink{cursor:pointer}.appSwitch{position:fixed;right:14px;top:14px;z-index:85;background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:10px;box-shadow:var(--shadow);backdrop-filter:blur(10px)}
+@media(max-width:600px){#entry{padding:18px}.entryBrand{font-size:32px}.entryTitle{font-size:39px;margin-top:32px}.entryChoices{grid-template-columns:1fr}.entryChoice{min-height:142px}.entryIcon{margin-bottom:18px}.entrySub{margin-bottom:25px}}
+</style>
+</head>
+<body>
+
+<section id="entry"><div class="entryGlow"></div><div class="entryInner"><div class="entryBrand">vastra<i>.</i></div><div class="entryKicker">Textile business, simplified</div><h1 class="entryTitle">One simple place for your business.</h1><p class="entrySub">A premium, mobile-first experience for textile owners and the customers who buy from them.</p><div class="entryChoices"><button class="entryChoice" onclick="enterOwner()"><div class="entryIcon">⌂</div><h2>Owner View</h2><p>Sales · Bills · Stock · GST · Payments · Orders</p><span class="entryArrow">↗</span></button><button class="entryChoice" onclick="openClientGate()"><div class="entryIcon">◇</div><h2>Client View</h2><p>Catalogue · Products · Cart · Orders</p><span class="entryArrow">↗</span></button></div><div class="entryFoot">Demo · Rajvi Textiles · Surat</div></div></section>
+<!-- OWNER -->
+<div id="ownerApp" class="hidden">
+<aside class="side">
+<div class="logo">vastra<i>.</i></div>
+<nav class="nav">
+<button class="active" data-owner="home"><span>⌂</span> Overview</button>
+<button data-owner="sales"><span>₹</span> Bills</button>
+<button data-owner="orders"><span>◫</span> Orders</button>
+<button data-owner="catalogue"><span>◇</span> Products</button>
+<button data-owner="customers"><span>♧</span> Customers</button>
+<button data-owner="stock"><span>▦</span> Stock</button>
+<button data-owner="gst"><span>✓</span> GST</button>
+</nav>
+<div class="sidefoot"><b>Rajvi Textiles</b>Surat · Textile Wholesale<br>● All systems operational</div>
+</aside>
+
+<button class="appSwitch" onclick="showClient()">Client View ↗</button>
+<main>
+<div class="top"><div><div class="date">Tuesday, 15 September 2026</div><h1 id="ownerTitle">Good morning, Rajvi 👋</h1></div><div class="actions"><button class="btn" onclick="openOwnerModal('payment')">+ Payment</button><button class="btn primary" onclick="openOwnerModal('sale')">+ New Bill</button></div></div>
+
+<section id="owner-home" class="page active">
+<div class="stats">
+<div class="stat detailLink" onclick="ownerPage('sales-detail')"><div class="label">Sales till date</div><div class="value">₹84.2L</div><div class="sub">↑ 12.8% this year</div></div>
+<div class="stat"><div class="label">Stock on hand</div><div class="value">₹18.6L</div><div class="sub">1,248 products</div></div>
+<div class="stat detailLink" onclick="ownerPage('payments-detail')"><div class="label">To collect</div><div class="value">₹2.14L</div><div class="sub warn">38 parties pending</div></div>
+<div class="stat detailLink" onclick="ownerPage('gst')"><div class="label">Net GST payable</div><div class="value">₹89,250</div><div class="sub">After input credit</div></div>
+</div>
+<div class="two">
+<div class="card"><div class="head"><h3>Business at a glance</h3><span>September</span></div>
+<table><tr><th>Metric</th><th>This month</th><th>Status</th></tr><tr><td>Sales</td><td>₹8,42,500</td><td><span class="pill green">Healthy</span></td></tr><tr><td>Collections</td><td>₹6,28,200</td><td><span class="pill green">86%</span></td></tr><tr><td>Orders</td><td>326</td><td><span class="pill green">+24 today</span></td></tr><tr><td>Low stock</td><td>12 designs</td><td><span class="pill warn">Review</span></td></tr></table>
+<div class="mobileTable" style="padding:0 15px 15px;gap:8px"><div class="row"><div><strong>Sales</strong><small>This month</small></div><b>₹8,42,500</b></div><div class="row"><div><strong>Collections</strong><small>This month</small></div><b>₹6,28,200</b></div><div class="row"><div><strong>Orders</strong><small>This month</small></div><b>326</b></div><div class="row"><div><strong>Low stock</strong><small>Designs to review</small></div><b>12</b></div></div>
+</div>
+<div class="card"><div class="head"><h3>Quick actions</h3><span>Simple by design</span></div><div class="quick">
+<button onclick="openOwnerModal('sale')"><b>+ New bill</b><small>Fixed-format invoice</small></button>
+<button onclick="openOwnerModal('eway')"><b>⚡ E-way bill</b><small>From an existing bill</small></button>
+<button onclick="ownerPage('catalogue')"><b>+ Product</b><small>Upload to catalogue</small></button>
+<button onclick="openOwnerModal('payment')"><b>₹ Payment</b><small>Update outstanding</small></button>
+</div></div>
+</div>
+<div class="notice"><div><strong style="font-size:12px">Money position</strong><p>Receivables, payables and collections.</p></div><button class="btn" onclick="ownerPage('outstanding-detail')">View money</button></div><div class="notice"><div><strong style="font-size:12px">Client orders</strong><p id="dashboardOrderText">Orders placed from the buyer catalogue appear here automatically.</p></div><button class="btn primary" onclick="ownerPage('orders')">View orders</button></div>
+<div class="card" style="margin-top:15px"><div class="head"><h3>GST position</h3><span>Current month</span></div><div class="gstgrid" style="padding:0 15px 15px"><div class="gstbox"><div class="label">GST Debit / Output</div><div class="value">₹1,51,650</div></div><div class="gstbox"><div class="label">GST Credit / Input</div><div class="value">₹62,400</div></div><div class="gstbox"><div class="label">Net payable</div><div class="value">₹89,250</div></div></div></div>
+</section>
+
+<section id="owner-sales" class="page">
+<div class="banner"><div><h2>Bills</h2><p>Create the bill on one fixed professional format.</p></div><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn" onclick="ownerPage('sales-detail')">Sales report</button><button class="btn" onclick="openOwnerModal('sale')">+ New Bill</button></div></div>
+<div class="card"><div class="head"><h3>Recent bills</h3><span>September 2026</span></div>
+<table><tr><th>Bill</th><th>Customer</th><th>Amount</th><th>Status</th><th></th></tr><tr><td>#INV-2841</td><td>Meera Fashion</td><td>₹42,800</td><td><span class="pill green">Paid</span></td><td><button class="btn small" onclick="openInvoice()">View</button></td></tr><tr><td>#INV-2840</td><td>Krishna Sarees</td><td>₹28,450</td><td><span class="pill warn">Partial</span></td><td><button class="btn small" onclick="openInvoice()">View</button></td></tr><tr><td>#INV-2839</td><td>Urban Ethnic</td><td>₹61,200</td><td><span class="pill green">Paid</span></td><td><button class="btn small" onclick="openOwnerModal('eway')">E-way</button></td></tr></table>
+<div class="mobileTable" style="padding:0 15px 15px;gap:8px"><div class="row"><div><strong>#INV-2841 · Meera Fashion</strong><small>₹42,800 · Paid</small></div><button class="btn small" onclick="openInvoice()">View</button></div><div class="row"><div><strong>#INV-2840 · Krishna Sarees</strong><small>₹28,450 · Partial</small></div><button class="btn small" onclick="openInvoice()">View</button></div><div class="row"><div><strong>#INV-2839 · Urban Ethnic</strong><small>₹61,200 · Paid</small></div><button class="btn small" onclick="openOwnerModal('eway')">E-way</button></div></div>
+</div></section>
+
+<section id="owner-orders" class="page">
+<div class="banner"><div><h2>Orders</h2><p>Buyer orders appear here with name, date and selected products.</p></div><button class="btn" onclick="openOwnerModal('order')">+ New Order</button></div>
+<div id="ownerOrders" class="rows"></div>
+</section>
+
+<section id="owner-catalogue" class="page">
+<div class="banner"><div><h2>Products</h2><p>50 demo products across 5 textile categories.</p></div><button class="btn" onclick="toggleUpload()">+ Upload Product</button></div>
+<div id="uploadPanel" class="upload hidden"><div class="head" style="padding:0 0 14px"><h3>Upload product</h3><span>New item</span></div><div class="uploadgrid">
+<div class="field"><label>PRODUCT NAME</label><input id="upName" placeholder="e.g. Noor Silk Saree"></div>
+<div class="field"><label>CATEGORY</label><select id="upCat"><option>Sarees</option><option>Kurtis</option><option>Ethnic Wear</option><option>Dress Material</option><option>Fabrics</option></select></div>
+<div class="field full"><label>DESCRIPTION</label><input id="upDesc" placeholder="Short useful description"></div>
+<div class="field"><label>RATE (₹)</label><input id="upPrice" type="number" placeholder="1850"></div>
+<div class="field"><label>STOCK</label><input id="upStock" type="number" placeholder="100"></div>
+<div class="filebox full"><label for="upImage">Tap to choose product image</label><input id="upImage" type="file" accept="image/*" onchange="previewUpload(this)"><div id="imageName">No image selected</div></div>
+</div><div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn primary" onclick="addUploadedProduct()">Save Product</button></div></div>
+<div class="toolbar"><input class="search" id="ownerSearch" placeholder="Search product, category..." oninput="renderOwnerProducts()"></div>
+<div class="cats" id="ownerCats"></div>
+<div class="products" id="ownerProducts"></div>
+</section>
+
+<section id="owner-customers" class="page">
+<div class="banner"><div><h2>Customers</h2><p>Balances, orders and contacts without ledger clutter.</p></div><button class="btn" onclick="openOwnerModal('customer')">+ Customer</button></div>
+<div class="rows"><div class="row"><div><strong>Meera Fashion</strong><small>18 orders · Last sale today</small></div><div class="right"><b>₹28,400</b><span class="pill warn">To collect</span></div></div><div class="row"><div><strong>Krishna Sarees</strong><small>32 orders · Last sale today</small></div><div class="right"><b>₹12,650</b><span class="pill warn">To collect</span></div></div><div class="row"><div><strong>Urban Ethnic</strong><small>11 orders · Last sale yesterday</small></div><div class="right"><b>₹0</b><span class="pill green">Clear</span></div></div></div>
+</section>
+
+<section id="owner-stock" class="page">
+<div class="banner"><div><h2>Stock</h2><p>Know what's available before promising a buyer.</p></div><button class="btn" onclick="toast('Stock adjustment opened')">Adjust</button></div>
+<div class="card"><div class="head"><h3>Stock health</h3><span id="stockCount">1,248 SKUs</span></div>
+<table><tr><th>Product</th><th>Category</th><th>Available</th><th>Status</th></tr><tr><td>Meher Silk</td><td>Saree</td><td>184 pcs</td><td><span class="pill green">Healthy</span></td></tr><tr><td>Riva Printed</td><td>Kurti</td><td>22 pcs</td><td><span class="pill warn">Low</span></td></tr><tr><td>Aarohi Set</td><td>Ethnic</td><td>8 pcs</td><td><span class="pill red">Critical</span></td></tr><tr><td>Gul Cotton</td><td>Saree</td><td>91 pcs</td><td><span class="pill green">Healthy</span></td></tr></table>
+<div class="mobileTable" style="padding:0 15px 15px;gap:8px"><div class="row"><div><strong>Meher Silk</strong><small>Saree · 184 pcs</small></div><span class="pill green">Healthy</span></div><div class="row"><div><strong>Riva Printed</strong><small>Kurti · 22 pcs</small></div><span class="pill warn">Low</span></div><div class="row"><div><strong>Aarohi Set</strong><small>Ethnic · 8 pcs</small></div><span class="pill red">Critical</span></div><div class="row"><div><strong>Gul Cotton</strong><small>Saree · 91 pcs</small></div><span class="pill green">Healthy</span></div></div>
+</div></section>
+
+<section id="owner-gst" class="page">
+<div class="banner"><div><h2>GST & E-way</h2><p>Generate an E-way bill directly from a completed computer bill.</p></div><button class="btn" onclick="openOwnerModal('eway')">⚡ Generate E-way</button></div>
+<div class="card"><div class="head"><h3>Invoices ready for E-way</h3><span>3 ready</span></div>
+<table><tr><th>Invoice</th><th>Buyer</th><th>Value</th><th></th></tr><tr><td>#INV-2841</td><td>Meera Fashion</td><td>₹42,800</td><td><button class="btn small" onclick="openOwnerModal('eway')">Generate</button></td></tr><tr><td>#INV-2840</td><td>Krishna Sarees</td><td>₹28,450</td><td><button class="btn small" onclick="openOwnerModal('eway')">Generate</button></td></tr><tr><td>#INV-2839</td><td>Urban Ethnic</td><td>₹61,200</td><td><button class="btn small" onclick="openOwnerModal('eway')">Generate</button></td></tr></table>
+<div class="mobileTable" style="padding:0 15px 15px;gap:8px"><div class="row"><div><strong>#INV-2841 · Meera Fashion</strong><small>Meera Fashion · ₹42,800</small></div><button class="btn small" onclick="openOwnerModal('eway')">Generate</button></div><div class="row"><div><strong>#INV-2840 · Krishna Sarees</strong><small>Krishna Sarees · ₹28,450</small></div><button class="btn small" onclick="openOwnerModal('eway')">Generate</button></div><div class="row"><div><strong>#INV-2839 · Urban Ethnic</strong><small>Urban Ethnic · ₹61,200</small></div><button class="btn small" onclick="openOwnerModal('eway')">Generate</button></div></div></div>
+<div class="card" style="margin-top:13px"><div class="head"><h3>GST position</h3><span>September</span></div><div class="gstgrid" style="padding:0 15px 15px"><div class="gstbox"><div class="label">Debit / Output GST</div><div class="value">₹1,51,650</div></div><div class="gstbox"><div class="label">Credit / Input GST</div><div class="value">₹62,400</div></div><div class="gstbox"><div class="label">Net payable</div><div class="value">₹89,250</div></div></div></div>
+</section>
+<section id="owner-sales-detail" class="page"><div class="banner"><div><h2>Sales report</h2><p>View sales for any year, date range or financial year.</p></div><button class="btn" onclick="ownerPage('sales')">← Bills</button></div><div class="card" style="padding:15px;margin-bottom:13px"><div class="uploadgrid"><div class="field"><label>FROM</label><input id="reportFrom" type="date" value="2026-04-01"></div><div class="field"><label>TO</label><input id="reportTo" type="date" value="2027-03-31"></div><div class="field"><label>PERIOD</label><select onchange="setReportPeriod(this.value)"><option value="fy">Current financial year</option><option value="year">Calendar year</option><option value="month">This month</option><option value="all">All available</option><option value="custom">Custom</option></select></div><div class="field" style="display:flex;align-items:end"><button class="btn primary" style="width:100%" onclick="renderSalesDetail()">View report</button></div></div></div><div class="stats" id="reportStats"></div><div class="card" style="margin-top:13px"><div class="head"><h3>Sales transactions</h3><span id="reportCount"></span></div><div id="salesDetailRows"></div></div></section>
+<section id="owner-payments-detail" class="page"><div class="banner"><div><h2>Payment collection</h2><p>Who paid · how much · what they purchased · linked bill.</p></div><button class="btn" onclick="openOwnerModal('payment')">+ Payment</button></div><div class="stats"><div class="stat"><div class="label">Collected</div><div class="value">₹6.28L</div><div class="sub">This month</div></div><div class="stat"><div class="label">Outstanding</div><div class="value">₹2.14L</div><div class="sub warn">38 parties</div></div><div class="stat"><div class="label">Overdue</div><div class="value">₹74,800</div><div class="sub warn">Follow-up</div></div><div class="stat"><div class="label">Settled</div><div class="value">86%</div><div class="sub">This month</div></div></div><div class="card" style="margin-top:13px"><div class="head"><h3>Collection ledger</h3><span>Open any payment</span></div><div id="paymentRows"></div></div></section>
+<section id="owner-outstanding-detail" class="page"><div class="banner"><div><h2>Money position</h2><p>Everything to receive and everything to pay.</p></div></div><div class="stats"><div class="stat"><div class="label">To collect</div><div class="value">₹2.14L</div><div class="sub warn">Customers</div></div><div class="stat"><div class="label">To give</div><div class="value">₹1.36L</div><div class="sub">Suppliers</div></div><div class="stat"><div class="label">Net position</div><div class="value">₹78,400</div><div class="sub">After payables</div></div><div class="stat"><div class="label">Pending parties</div><div class="value">38</div><div class="sub warn">Receivable</div></div></div><div class="two"><div class="card"><div class="head"><h3>To collect</h3><span>Customers</span></div><div id="receivableRows"></div></div><div class="card"><div class="head"><h3>To give</h3><span>Suppliers</span></div><div id="payableRows"></div></div></div></section></main>
+
+<nav class="mobilebar">
+<button class="active" data-owner="home"><b>⌂</b>Home</button><button data-owner="sales"><b>₹</b>Bills</button><button data-owner="orders"><b>◫</b>Orders</button><button data-owner="catalogue"><b>◇</b>Products</button><button data-owner="customers"><b>♧</b>Customers</button>
+</nav>
+</div>
+
+<!-- CLIENT VIEW -->
+<div id="clientApp" class="hidden">
+<button class="clientSwitch" onclick="showOwner()">Owner View ↗</button>
+<div class="client">
+<div class="clientTop"><b>rajvi textiles<span style="color:var(--brand)">.</span></b><span>Surat · Wholesale</span></div>
+<div class="welcome"><h2>Explore our collection</h2><p>Choose products, add quantities and send your order directly to Rajvi Textiles.</p></div>
+<div class="gate" id="clientGate"><p>Enter your details to open the catalogue.</p><div class="gategrid"><input id="clientName" placeholder="Your name" autocomplete="name"><input id="clientPhone" placeholder="WhatsApp number" inputmode="tel" autocomplete="tel"><input id="clientCity" placeholder="City (optional)" autocomplete="address-level2"><button onclick="startClientShop()">Go to catalogue →</button></div></div>
+<div id="clientShop" class="hidden"><div class="cats" id="clientCats"></div><div class="clientProducts" id="clientProducts"></div></div>
+</div>
+<div class="clientCart"><div><b id="cartCount">0 items</b><small id="cartTotal">₹0</small></div><button onclick="openCart()">View cart →</button></div>
+</div>
+
+<!-- CART -->
+<div class="cartModal" id="cartModal"><button class="close" onclick="closeCart()">← Back</button><h2 style="margin-top:22px">Your order</h2><div id="cartLines"></div><div class="line"><b>Total</b><b id="total2">₹0</b></div><button class="place" onclick="placeOrder()">Place order & send confirmation</button><p style="font-size:10px;color:#777">Your order is added instantly to Owner → Orders. This demo generates the order PDF and opens the owner WhatsApp chat. Production can auto-send the PDF using WhatsApp Business API.</p></div>
+
+<!-- OWNER MODAL -->
+<div class="modalback" id="ownerModalBack" onclick="if(event.target===this)closeOwnerModal()"><div class="modal" id="ownerModal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const DEMO_PRODUCTS = [{"id": 1, "name": "Meher Banarasi Silk Saree", "category": "Sarees", "description": "Banarasi silk · Zari border", "price": 1850, "image": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=82", "stock": 35}, {"id": 2, "name": "Gul Cotton Saree", "category": "Sarees", "description": "Soft cotton · Printed", "price": 980, "image": "https://images.unsplash.com/photo-1583391733956-6c78276477e2?auto=format&fit=crop&w=900&q=82", "stock": 52}, {"id": 3, "name": "Noor Organza Saree", "category": "Sarees", "description": "Organza · Festive", "price": 1450, "image": "https://images.unsplash.com/photo-1610189012906-9a4b7d7c0b44?auto=format&fit=crop&w=900&q=82", "stock": 69}, {"id": 4, "name": "Aarohi Chanderi Saree", "category": "Sarees", "description": "Chanderi · Hand feel", "price": 1290, "image": "https://images.unsplash.com/photo-1583391733981-5f3b4e5b1e3f?auto=format&fit=crop&w=900&q=82", "stock": 86}, {"id": 5, "name": "Ruhani Kanjivaram Saree", "category": "Sarees", "description": "Silk · Temple border", "price": 2850, "image": "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?auto=format&fit=crop&w=900&q=82", "stock": 103}, {"id": 6, "name": "Meera Linen Saree", "category": "Sarees", "description": "Linen blend · Elegant", "price": 1190, "image": "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=900&q=82", "stock": 120}, {"id": 7, "name": "Zoya Georgette Saree", "category": "Sarees", "description": "Georgette · Party wear", "price": 1320, "image": "https://images.unsplash.com/photo-1618932260643-eee4a2f652a6?auto=format&fit=crop&w=900&q=82", "stock": 137}, {"id": 8, "name": "Kashi Tussar Saree", "category": "Sarees", "description": "Tussar silk · Woven", "price": 2190, "image": "https://images.unsplash.com/photo-1610652492500-ded49ceeb378?auto=format&fit=crop&w=900&q=82", "stock": 154}, {"id": 9, "name": "Riya Printed Saree", "category": "Sarees", "description": "Crepe · Floral print", "price": 890, "image": "https://images.unsplash.com/photo-1590735213920-68192a487bc2?auto=format&fit=crop&w=900&q=82", "stock": 171}, {"id": 10, "name": "Naira Chiffon Saree", "category": "Sarees", "description": "Chiffon · Lightweight", "price": 760, "image": "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=82", "stock": 188}, {"id": 11, "name": "Riva Printed Kurti", "category": "Kurtis", "description": "Rayon · Everyday", "price": 720, "image": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=82", "stock": 205}, {"id": 12, "name": "Ira Straight Kurti", "category": "Kurtis", "description": "Cotton · Straight fit", "price": 680, "image": "https://images.unsplash.com/photo-1583391733956-6c78276477e2?auto=format&fit=crop&w=900&q=82", "stock": 32}, {"id": 13, "name": "Aanya Anarkali Kurti", "category": "Kurtis", "description": "Rayon · Flared", "price": 890, "image": "https://images.unsplash.com/photo-1610189012906-9a4b7d7c0b44?auto=format&fit=crop&w=900&q=82", "stock": 49}, {"id": 14, "name": "Mahi Embroidered Kurti", "category": "Kurtis", "description": "Viscose · Embroidery", "price": 1090, "image": "https://images.unsplash.com/photo-1583391733981-5f3b4e5b1e3f?auto=format&fit=crop&w=900&q=82", "stock": 66}, {"id": 15, "name": "Tara Slub Kurti", "category": "Kurtis", "description": "Slub cotton · Minimal", "price": 760, "image": "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?auto=format&fit=crop&w=900&q=82", "stock": 83}, {"id": 16, "name": "Kiara Long Kurti", "category": "Kurtis", "description": "Rayon · 8 colours", "price": 820, "image": "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=900&q=82", "stock": 100}, {"id": 17, "name": "Avni Co-ord Kurti", "category": "Kurtis", "description": "Cotton blend · Modern", "price": 980, "image": "https://images.unsplash.com/photo-1618932260643-eee4a2f652a6?auto=format&fit=crop&w=900&q=82", "stock": 117}, {"id": 18, "name": "Diya Printed Kurti", "category": "Kurtis", "description": "Viscose · Floral", "price": 740, "image": "https://images.unsplash.com/photo-1610652492500-ded49ceeb378?auto=format&fit=crop&w=900&q=82", "stock": 134}, {"id": 19, "name": "Sara Festive Kurti", "category": "Kurtis", "description": "Silk blend · Festive", "price": 1250, "image": "https://images.unsplash.com/photo-1590735213920-68192a487bc2?auto=format&fit=crop&w=900&q=82", "stock": 151}, {"id": 20, "name": "Myra A-line Kurti", "category": "Kurtis", "description": "Rayon · A-line", "price": 850, "image": "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=82", "stock": 168}, {"id": 21, "name": "Aarohi Ethnic Set", "category": "Ethnic Wear", "description": "Georgette · 3 piece", "price": 1490, "image": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=82", "stock": 185}, {"id": 22, "name": "Ishani Embroidered Set", "category": "Ethnic Wear", "description": "Silk blend · Embroidery", "price": 1890, "image": "https://images.unsplash.com/photo-1583391733956-6c78276477e2?auto=format&fit=crop&w=900&q=82", "stock": 202}, {"id": 23, "name": "Vanya Festive Set", "category": "Ethnic Wear", "description": "Organza · Festive", "price": 2250, "image": "https://images.unsplash.com/photo-1610189012906-9a4b7d7c0b44?auto=format&fit=crop&w=900&q=82", "stock": 29}, {"id": 24, "name": "Anaya Mirror Work Set", "category": "Ethnic Wear", "description": "Rayon · Mirror work", "price": 1590, "image": "https://images.unsplash.com/photo-1583391733981-5f3b4e5b1e3f?auto=format&fit=crop&w=900&q=82", "stock": 46}, {"id": 25, "name": "Kavya Palazzo Set", "category": "Ethnic Wear", "description": "Cotton blend · 3 piece", "price": 1290, "image": "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?auto=format&fit=crop&w=900&q=82", "stock": 63}, {"id": 26, "name": "Navya Printed Set", "category": "Ethnic Wear", "description": "Viscose · Printed", "price": 1190, "image": "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=900&q=82", "stock": 80}, {"id": 27, "name": "Rhea Chikankari Set", "category": "Ethnic Wear", "description": "Cotton · Chikankari", "price": 1750, "image": "https://images.unsplash.com/photo-1618932260643-eee4a2f652a6?auto=format&fit=crop&w=900&q=82", "stock": 97}, {"id": 28, "name": "Saanvi Sharara Set", "category": "Ethnic Wear", "description": "Georgette · Sharara", "price": 2390, "image": "https://images.unsplash.com/photo-1610652492500-ded49ceeb378?auto=format&fit=crop&w=900&q=82", "stock": 114}, {"id": 29, "name": "Ishita Kurta Set", "category": "Ethnic Wear", "description": "Rayon · Straight", "price": 1390, "image": "https://images.unsplash.com/photo-1590735213920-68192a487bc2?auto=format&fit=crop&w=900&q=82", "stock": 131}, {"id": 30, "name": "Aditi Festive Set", "category": "Ethnic Wear", "description": "Silk blend · Woven", "price": 1990, "image": "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=82", "stock": 148}, {"id": 31, "name": "Royal Floral Dress Material", "category": "Dress Material", "description": "Cotton · 3.2 m", "price": 690, "image": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=82", "stock": 165}, {"id": 32, "name": "Suhana Chanderi Dress Material", "category": "Dress Material", "description": "Chanderi · 3 m", "price": 920, "image": "https://images.unsplash.com/photo-1583391733956-6c78276477e2?auto=format&fit=crop&w=900&q=82", "stock": 182}, {"id": 33, "name": "Nazaara Rayon Dress Material", "category": "Dress Material", "description": "Rayon · Printed", "price": 620, "image": "https://images.unsplash.com/photo-1610189012906-9a4b7d7c0b44?auto=format&fit=crop&w=900&q=82", "stock": 199}, {"id": 34, "name": "Meher Cotton Dress Material", "category": "Dress Material", "description": "Cotton · Printed", "price": 580, "image": "https://images.unsplash.com/photo-1583391733981-5f3b4e5b1e3f?auto=format&fit=crop&w=900&q=82", "stock": 26}, {"id": 35, "name": "Gulab Slub Dress Material", "category": "Dress Material", "description": "Slub cotton · 3 m", "price": 740, "image": "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?auto=format&fit=crop&w=900&q=82", "stock": 43}, {"id": 36, "name": "Aarav Linen Dress Material", "category": "Dress Material", "description": "Linen blend · Solid", "price": 850, "image": "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=900&q=82", "stock": 60}, {"id": 37, "name": "Noor Modal Dress Material", "category": "Dress Material", "description": "Modal · Printed", "price": 980, "image": "https://images.unsplash.com/photo-1618932260643-eee4a2f652a6?auto=format&fit=crop&w=900&q=82", "stock": 77}, {"id": 38, "name": "Rangoli Jaipuri Dress Material", "category": "Dress Material", "description": "Cotton · Block print", "price": 790, "image": "https://images.unsplash.com/photo-1610652492500-ded49ceeb378?auto=format&fit=crop&w=900&q=82", "stock": 94}, {"id": 39, "name": "Ziva Muslin Dress Material", "category": "Dress Material", "description": "Muslin · Soft", "price": 880, "image": "https://images.unsplash.com/photo-1590735213920-68192a487bc2?auto=format&fit=crop&w=900&q=82", "stock": 111}, {"id": 40, "name": "Kaira Festive Dress Material", "category": "Dress Material", "description": "Silk blend · Woven", "price": 1190, "image": "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=82", "stock": 128}, {"id": 41, "name": "Mogra Cotton Fabric", "category": "Fabrics", "description": "Cotton · 44 inch", "price": 320, "image": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=82", "stock": 145}, {"id": 42, "name": "Indigo Slub Fabric", "category": "Fabrics", "description": "Slub cotton · 44 inch", "price": 390, "image": "https://images.unsplash.com/photo-1583391733956-6c78276477e2?auto=format&fit=crop&w=900&q=82", "stock": 162}, {"id": 43, "name": "Mira Rayon Fabric", "category": "Fabrics", "description": "Rayon · 44 inch", "price": 360, "image": "https://images.unsplash.com/photo-1610189012906-9a4b7d7c0b44?auto=format&fit=crop&w=900&q=82", "stock": 179}, {"id": 44, "name": "Kora Linen Fabric", "category": "Fabrics", "description": "Linen blend · 44 inch", "price": 520, "image": "https://images.unsplash.com/photo-1583391733981-5f3b4e5b1e3f?auto=format&fit=crop&w=900&q=82", "stock": 196}, {"id": 45, "name": "Noor Satin Fabric", "category": "Fabrics", "description": "Satin · 44 inch", "price": 440, "image": "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?auto=format&fit=crop&w=900&q=82", "stock": 23}, {"id": 46, "name": "Zari Brocade Fabric", "category": "Fabrics", "description": "Brocade · Festive", "price": 780, "image": "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=900&q=82", "stock": 40}, {"id": 47, "name": "Madhav Jacquard Fabric", "category": "Fabrics", "description": "Jacquard · Woven", "price": 650, "image": "https://images.unsplash.com/photo-1618932260643-eee4a2f652a6?auto=format&fit=crop&w=900&q=82", "stock": 57}, {"id": 48, "name": "Gulabi Chanderi Fabric", "category": "Fabrics", "description": "Chanderi · 44 inch", "price": 590, "image": "https://images.unsplash.com/photo-1610652492500-ded49ceeb378?auto=format&fit=crop&w=900&q=82", "stock": 74}, {"id": 49, "name": "Rang Silk Blend Fabric", "category": "Fabrics", "description": "Silk blend · 44 inch", "price": 710, "image": "https://images.unsplash.com/photo-1590735213920-68192a487bc2?auto=format&fit=crop&w=900&q=82", "stock": 91}, {"id": 50, "name": "Aarohi Velvet Fabric", "category": "Fabrics", "description": "Velvet · Winter", "price": 820, "image": "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=82", "stock": 108}];
+let allProducts=loadJSON("vastra_products",[...DEMO_PRODUCTS]);
+let selectedOwnerCategory=localStorage.getItem("vastra_owner_category")||"All";
+let selectedClientCategory=localStorage.getItem("vastra_client_category")||"All";
+let clientUser=loadJSON("vastra_client_user",{name:"",phone:"",city:""});
+let cart=loadJSON("vastra_cart",{});
+let uploadedImageData="";
+let currentOwnerPage=localStorage.getItem("vastra_owner_page")||"home";
+let currentView="entry";
+const OWNER_WHATSAPP="919999999999"; // Demo owner WhatsApp. Replace with the real business WhatsApp number.
+
+function loadJSON(key,fallback){
+  try{
+    const v=localStorage.getItem(key);
+    return v===null?fallback:JSON.parse(v);
+  }catch(e){return fallback}
+}
+function saveState(){
+  localStorage.setItem("vastra_products",JSON.stringify(allProducts));
+  localStorage.setItem("vastra_owner_category",selectedOwnerCategory);
+  localStorage.setItem("vastra_client_category",selectedClientCategory);
+  localStorage.setItem("vastra_client_user",JSON.stringify(clientUser));
+  localStorage.setItem("vastra_cart",JSON.stringify(cart));
+  localStorage.setItem("vastra_owner_page",currentOwnerPage);
+  localStorage.setItem("vastra_view",currentView);
+}
+
+const demoSales=[{id:"#INV-2841",date:"2026-09-15",customer:"Meera Fashion",city:"Surat",items:["Meher Silk Saree × 20"],amount:38850,status:"Paid"},{id:"#INV-2840",date:"2026-09-14",customer:"Krishna Sarees",city:"Ahmedabad",items:["Riva Printed Kurti × 25","Gul Cotton Saree × 10"],amount:28450,status:"Partial"},{id:"#INV-2839",date:"2026-09-12",customer:"Urban Ethnic",city:"Mumbai",items:["Aarohi Ethnic Set × 30"],amount:61200,status:"Paid"},{id:"#INV-2838",date:"2026-09-08",customer:"Shree Collection",city:"Rajkot",items:["Noor Organza Saree × 18"],amount:26100,status:"Pending"},{id:"#INV-2817",date:"2026-06-22",customer:"Aarti Fashion",city:"Vadodara",items:["Riya Printed Saree × 40"],amount:35600,status:"Paid"},{id:"#INV-2704",date:"2025-11-18",customer:"Meera Fashion",city:"Surat",items:["Ira Straight Kurti × 60"],amount:40800,status:"Paid"},{id:"#INV-2418",date:"2025-03-04",customer:"Krishna Sarees",city:"Ahmedabad",items:["Ruhani Kanjivaram Saree × 12"],amount:34200,status:"Paid"}];
+const demoCollections=[{id:"PAY-884",date:"2026-09-15",customer:"Meera Fashion",bill:"#INV-2841",amount:30000,items:"Meher Silk Saree × 20",mode:"Bank"},{id:"PAY-883",date:"2026-09-14",customer:"Urban Ethnic",bill:"#INV-2839",amount:61200,items:"Aarohi Ethnic Set × 30",mode:"UPI"},{id:"PAY-882",date:"2026-09-12",customer:"Aarti Fashion",bill:"#INV-2817",amount:20000,items:"Riya Printed Saree × 40",mode:"Bank"},{id:"PAY-881",date:"2026-09-10",customer:"Shree Collection",bill:"#INV-2838",amount:12000,items:"Noor Organza Saree × 18",mode:"UPI"}];
+function setReportPeriod(v){let a=document.getElementById("reportFrom"),b=document.getElementById("reportTo");if(v==="month"){a.value="2026-09-01";b.value="2026-09-30"}else if(v==="year"){a.value="2026-01-01";b.value="2026-12-31"}else if(v==="fy"){a.value="2026-04-01";b.value="2027-03-31"}else if(v==="all"){a.value="2025-01-01";b.value="2027-03-31"}}
+function renderSalesDetail(){let a=document.getElementById("reportFrom").value,b=document.getElementById("reportTo").value,r=demoSales.filter(x=>(!a||x.date>=a)&&(!b||x.date<=b)),t=r.reduce((n,x)=>n+x.amount,0);document.getElementById("reportStats").innerHTML=`<div class="stat"><div class="label">Sales in period</div><div class="value">₹${t.toLocaleString("en-IN")}</div></div><div class="stat"><div class="label">Invoices</div><div class="value">${r.length}</div></div><div class="stat"><div class="label">Average invoice</div><div class="value">₹${r.length?Math.round(t/r.length).toLocaleString("en-IN"):"0"}</div></div><div class="stat"><div class="label">Paid invoices</div><div class="value">${r.filter(x=>x.status==="Paid").length}</div></div>`;document.getElementById("reportCount").textContent=r.length+" invoices";document.getElementById("salesDetailRows").innerHTML=r.length?r.map(x=>`<div class="row" style="margin:0;border-radius:0;border-left:0;border-right:0"><div><strong>${x.id} · ${x.customer}</strong><small>${x.date} · ${x.city}<br>${x.items.join(" · ")}</small></div><div class="right"><b>₹${x.amount.toLocaleString("en-IN")}</b><button class="btn small" onclick="openSalesOrder('${x.id}')">View</button></div></div>`).join(""):'<div class="empty">No sales in this period.</div>'}
+function openSalesOrder(id){let x=demoSales.find(v=>v.id===id);if(!x)return;document.getElementById("ownerModal").innerHTML=`<h2>${x.id}</h2><p>${x.customer} · ${x.city} · ${x.date}</p><div class="fields"><div class="row"><div><strong>Products</strong><small>${x.items.join("<br>")}</small></div><b>₹${x.amount.toLocaleString("en-IN")}</b></div><div class="row"><strong>Status</strong><span class="pill ${x.status==="Paid"?"green":"warn"}">${x.status}</span></div></div><div class="modalfoot"><button class="btn" onclick="closeOwnerModal()">Close</button><button class="btn" onclick="openInvoice()">View invoice</button></div>`;document.getElementById("ownerModalBack").style.display="flex"}
+function renderPaymentDetail(){document.getElementById("paymentRows").innerHTML=demoCollections.map(x=>`<div class="row" style="margin:0;border-radius:0;border-left:0;border-right:0"><div><strong>${x.customer} · ${x.id}</strong><small>${x.date} · ${x.bill}<br>Purchased: ${x.items} · ${x.mode}</small></div><div class="right"><b>₹${x.amount.toLocaleString("en-IN")}</b><button class="btn small" onclick="openPaymentDetail('${x.id}')">View</button></div></div>`).join("")}
+function openPaymentDetail(id){let x=demoCollections.find(v=>v.id===id);if(!x)return;document.getElementById("ownerModal").innerHTML=`<h2>Payment ${x.id}</h2><p>${x.customer} · ${x.date}</p><div class="fields"><div class="row"><div><strong>Linked bill</strong><small>${x.bill}</small></div><button class="btn small" onclick="openSalesOrder('${x.bill}')">View</button></div><div class="row"><div><strong>Purchase</strong><small>${x.items}</small></div><b>₹${x.amount.toLocaleString("en-IN")}</b></div><div class="row"><strong>Payment mode</strong><span class="pill green">${x.mode}</span></div></div><div class="modalfoot"><button class="btn" onclick="closeOwnerModal()">Close</button></div>`;document.getElementById("ownerModalBack").style.display="flex"}
+function renderMoneyDetail(){document.getElementById("receivableRows").innerHTML=[["Meera Fashion","₹28,400","18 orders"],["Krishna Sarees","₹12,650","32 orders"],["Shree Collection","₹41,200","7 orders"],["Aarti Fashion","₹18,550","11 orders"]].map(x=>`<div class="row" style="border-radius:0;border-left:0;border-right:0"><div><strong>${x[0]}</strong><small>${x[2]}</small></div><b>${x[1]}</b></div>`).join("");document.getElementById("payableRows").innerHTML=[["Shakti Fabrics","₹54,800","Fabric supplier"],["Kiran Weaves","₹42,600","Silk supplier"],["Om Textiles","₹38,700","Packaging & fabric"]].map(x=>`<div class="row" style="border-radius:0;border-left:0;border-right:0"><div><strong>${x[0]}</strong><small>${x[2]}</small></div><b>${x[1]}</b></div>`).join("")}
+
+/* owner navigation */
+const ownerTitles={home:"Good morning, Rajvi 👋",sales:"Bills",orders:"Orders",catalogue:"Products",customers:"Customers",stock:"Stock",gst:"GST & E-way"};
+document.querySelectorAll("[data-owner]").forEach(b=>b.addEventListener("click",()=>ownerPage(b.dataset.owner)));
+function showEntry(){currentView="entry";localStorage.setItem("vastra_view","entry");document.getElementById("entry").classList.remove("hidden");document.getElementById("ownerApp").classList.add("hidden");document.getElementById("clientApp").classList.add("hidden");window.scrollTo(0,0)}
+function enterOwner(){currentView="owner";localStorage.setItem("vastra_view","owner");document.getElementById("entry").classList.add("hidden");document.getElementById("clientApp").classList.add("hidden");document.getElementById("ownerApp").classList.remove("hidden");ownerPage(currentOwnerPage||"home")}
+function openClientGate(){currentView="client-gate";localStorage.setItem("vastra_view","client");document.getElementById("entry").classList.add("hidden");document.getElementById("ownerApp").classList.add("hidden");document.getElementById("clientApp").classList.remove("hidden");document.getElementById("clientGate").classList.remove("hidden");document.getElementById("clientShop").classList.add("hidden");window.scrollTo(0,0);document.getElementById("clientName").focus()}
+function ownerPage(id){
+ currentOwnerPage=id;
+ localStorage.setItem("vastra_owner_page",id);
+ localStorage.setItem("vastra_view","owner");
+ document.querySelectorAll("#ownerApp .page").forEach(x=>x.classList.remove("active"));
+ document.getElementById("owner-"+id).classList.add("active");
+ document.querySelectorAll("#ownerApp [data-owner]").forEach(x=>x.classList.toggle("active",x.dataset.owner===id));
+ document.getElementById("ownerTitle").textContent=ownerTitles[id];
+ if(id==="catalogue")renderOwnerProducts();
+ if(id==="orders")renderOwnerOrders();
+ if(id==="sales-detail")renderSalesDetail();
+ if(id==="payments-detail")renderPaymentDetail();
+ if(id==="outstanding-detail")renderMoneyDetail();
+ window.scrollTo(0,0);
+}
+function showClient(){openClientGate()}
+function showOwner(){enterOwner()}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.style.display="block";clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.style.display="none",2300)}
+
+/* owner product catalogue */
+function renderOwnerCategories(){
+ const cats=["All","Sarees","Kurtis","Ethnic Wear","Dress Material","Fabrics"];
+ document.getElementById("ownerCats").innerHTML=cats.map(c=>`<button class="${c===selectedOwnerCategory?'active':''}" onclick="setOwnerCategory('${c}')">${c}</button>`).join("");
+}
+function setOwnerCategory(c){
+ selectedOwnerCategory=c;
+ localStorage.setItem("vastra_owner_category",c);
+ renderOwnerProducts();
+}
+function renderOwnerProducts(){
+ renderOwnerCategories();
+ const q=(document.getElementById("ownerSearch")?.value||"").toLowerCase();
+ const list=allProducts.filter(p=>(selectedOwnerCategory==="All"||p.category===selectedOwnerCategory)&&(p.name+" "+p.category+" "+p.description).toLowerCase().includes(q));
+ document.getElementById("ownerProducts").innerHTML=list.map(p=>`
+ <div class="product"><img src="${p.image}" alt="${p.name}" loading="lazy"><div class="body"><h4>${p.name}</h4><p>${p.description}</p><div class="bottom"><span class="price">₹${p.price.toLocaleString("en-IN")}</span><div class="qty"><button onclick="changeQty(this,-1)">−</button><span>0</span><button onclick="changeQty(this,1)">+</button></div></div></div></div>`).join("")||'<div class="empty" style="grid-column:1/-1">No products found.</div>';
+}
+function changeQty(btn,d){let s=btn.parentElement.querySelector("span"),n=Math.max(0,+s.textContent+d);s.textContent=n;if(n)toast("Quantity updated")}
+function toggleUpload(){document.getElementById("uploadPanel").classList.toggle("hidden");window.scrollTo({top:0,behavior:"smooth"})}
+function previewUpload(input){uploadedImageData="";if(input.files&&input.files[0]){document.getElementById("imageName").textContent=input.files[0].name;const r=new FileReader();r.onload=e=>uploadedImageData=e.target.result;r.readAsDataURL(input.files[0])}}
+function addUploadedProduct(){
+ const name=document.getElementById("upName").value.trim(),cat=document.getElementById("upCat").value,desc=document.getElementById("upDesc").value.trim(),price=+document.getElementById("upPrice").value,stock=+document.getElementById("upStock").value;
+ if(!name||!desc||!price||!stock){toast("Add product, description, rate and stock.");return}
+ allProducts.unshift({id:Date.now(),name,category:cat,description:desc,price,stock,image:uploadedImageData||"https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=82"});
+ localStorage.setItem("vastra_products",JSON.stringify(allProducts));
+ ["upName","upDesc","upPrice","upStock"].forEach(id=>document.getElementById(id).value="");document.getElementById("imageName").textContent="No image selected";uploadedImageData="";document.getElementById("uploadPanel").classList.add("hidden");renderOwnerProducts();toast("✓ Product uploaded")}
+
+/* owner orders — reads client orders saved in this browser */
+function getOrders(){try{return JSON.parse(localStorage.getItem("vastra_orders")||"[]")}catch(e){return[]}}
+function saveOrders(a){localStorage.setItem("vastra_orders",JSON.stringify(a))}
+function renderOwnerOrders(){
+ const orders=getOrders(),box=document.getElementById("ownerOrders");
+ if(!orders.length){box.innerHTML='<div class="card"><div class="empty"><b>No client orders yet</b><br><span style="font-size:11px">Open the client view, place a test order, then come back here.</span></div></div>';return}
+ box.innerHTML=orders.map(o=>`<div class="orderCard"><div class="orderTop"><div><strong>${o.name}</strong><small>${o.city} · ${o.date}</small></div><span class="pill warn">${o.status}</span></div><div class="orderItems">${o.items.map(i=>`${i.name} × ${i.qty} · ₹${(i.qty*i.price).toLocaleString("en-IN")}`).join("<br>")}</div><div class="orderFooter"><b>₹${o.total.toLocaleString("en-IN")}</b><button class="btn small" onclick="viewOrder('${o.id}')">View</button></div></div>`).join("");
+ document.getElementById("dashboardOrderText").textContent=orders.length+" buyer order"+(orders.length===1?"":"s")+" received from the client catalogue.";
+}
+function viewOrder(id){
+ const o=getOrders().find(x=>String(x.id)===String(id));if(!o)return;
+ document.getElementById("ownerModal").innerHTML=`<h2>Order ${o.id}</h2><p>${o.name} · ${o.phone} · ${o.city} · ${o.date}</p><div class="fields">${o.items.map(i=>`<div class="row"><div><strong>${i.name}</strong><small>${i.qty} × ₹${i.price.toLocaleString("en-IN")}</small></div><b>₹${(i.qty*i.price).toLocaleString("en-IN")}</b></div>`).join("")}<div class="row"><strong>Total</strong><b>₹${o.total.toLocaleString("en-IN")}</b></div></div><div class="modalfoot"><button class="btn" onclick="closeOwnerModal()">Close</button><button class="btn primary" onclick="toast('Order PDF prepared in demo')">Order PDF</button></div>`;
+ document.getElementById("ownerModalBack").style.display="flex";
+}
+
+/* owner modals / bill */
+const ownerForms={
+payment:["Record payment",`<div class="fields"><div class="field"><label>CUSTOMER</label><input value="Meera Fashion"></div><div class="field"><label>AMOUNT (₹)</label><input value="30000"></div><div class="field"><label>MODE</label><select><option>Bank</option><option>UPI</option><option>Cash</option></select></div></div>`],
+order:["Create order",`<div class="fields"><div class="field"><label>CUSTOMER</label><input value="Meera Fashion"></div><div class="field"><label>PRODUCTS</label><input value="Meher Silk × 50"></div><div class="field"><label>EXPECTED DISPATCH</label><input type="date" value="2026-09-20"></div></div>`],
+customer:["Add customer",`<div class="fields"><div class="field"><label>BUSINESS NAME</label><input placeholder="Aarti Fashion"></div><div class="field"><label>PHONE</label><input placeholder="+91"></div><div class="field"><label>CITY</label><input placeholder="Surat"></div><div class="field"><label>GSTIN</label><input placeholder="Optional"></div></div>`],
+eway:["One-click E-way Bill",`<p style="background:#eef5f1;padding:12px;border-radius:11px">✓ Invoice <b>#INV-2841</b> selected. Buyer, value, GST and item details are pulled automatically from the computer bill.</p><div class="fields"><div class="field"><label>TRANSPORT MODE</label><select><option>Road</option><option>Rail</option><option>Air</option></select></div><div class="field"><label>VEHICLE NUMBER</label><input placeholder="GJ05AB1234"></div><div class="field"><label>TRANSPORTER ID (OPTIONAL)</label><input></div></div>`]
+};
+function openOwnerModal(type){
+ if(type==="sale"){openBillEditor();return}
+ const f=ownerForms[type];
+ document.getElementById("ownerModal").innerHTML=`<h2>${f[0]}</h2><p>${type==="eway"?"Demo flow — production will connect to the government E-way Bill API.":"Keep it short. Production saves this directly to the business."}</p>${f[1]}<div class="modalfoot"><button class="btn" onclick="closeOwnerModal()">Cancel</button><button class="btn primary" onclick="submitOwnerModal('${type}')">${type==="eway"?"Generate E-way Bill":"Save"}</button></div>`;
+ document.getElementById("ownerModalBack").style.display="flex";
+}
+function closeOwnerModal(){document.getElementById("ownerModalBack").style.display="none"}
+function submitOwnerModal(type){closeOwnerModal();toast(type==="eway"?"✓ E-way bill generated in demo":"✓ Saved successfully");if(type==="order")ownerPage("orders")}
+function openBillEditor(){
+ document.getElementById("ownerModal").innerHTML=`<h2>Create new bill</h2><p>One fixed format. Add another particular only when you need it.</p>
+ <div class="fields"><div class="field"><label>CUSTOMER</label><input id="billCustomer" value="Meera Fashion"></div><div class="field"><label>DATE</label><input id="billDate" type="date" value="2026-09-15"></div></div>
+ <div style="display:flex;justify-content:space-between;align-items:center"><strong style="font-size:12px">Particulars</strong><button class="btn small" onclick="addBillRow()">+ Add more</button></div>
+ <div id="billRows" class="billRows"></div>
+ <div class="row"><div><strong>GST</strong><small>Applied to taxable amount</small></div><select id="billGst" style="border:1px solid var(--line);border-radius:9px;padding:9px"><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option></select></div>
+ <div class="modalfoot" style="margin-top:15px"><button class="btn" onclick="closeOwnerModal()">Cancel</button><button class="btn primary" onclick="validateAndPreviewBill()">Generate Bill</button></div>`;
+ document.getElementById("ownerModalBack").style.display="flex";addBillRow(true);
+}
+function addBillRow(first=false){
+ const wrap=document.getElementById("billRows"),idx=wrap.children.length+1;
+ const row=document.createElement("div");row.className="billRow";
+ row.innerHTML=`<div class="particularField"><div class="billLabel">PARTICULAR</div><input class="bPart" placeholder="e.g. Meher Silk Saree" value="${first?"Meher Silk Saree":""}"></div><div class="qtyField"><div class="billLabel">QUANTITY</div><input class="bQty" type="number" min="1" placeholder="Qty" value="${first?20:""}"></div><div class="rateField"><div class="billLabel">RATE (₹)</div><input class="bRate" type="number" min="0.01" placeholder="Rate" value="${first?1850:""}"></div><div class="amountField"><div class="billLabel">AMOUNT</div><input class="bAmount" readonly placeholder="—"></div><button class="remove" title="Delete this particular" onclick="this.parentElement.remove();recalcBill()">×</button>`;
+ wrap.appendChild(row);row.querySelectorAll(".bQty,.bRate").forEach(x=>x.addEventListener("input",recalcBill));recalcBill();
+}
+function recalcBill(){document.querySelectorAll(".billRow").forEach(r=>{let q=+r.querySelector(".bQty").value||0,rate=+r.querySelector(".bRate").value||0;r.querySelector(".bAmount").value=q&&rate?"₹"+(q*rate).toLocaleString("en-IN"):"";})}
+function validateAndPreviewBill(){
+ const rows=[...document.querySelectorAll(".billRow")];if(!rows.length){toast("Add at least one particular.");return}
+ for(let r of rows){let p=r.querySelector(".bPart").value.trim(),q=+r.querySelector(".bQty").value,rate=+r.querySelector(".bRate").value;if(!p||!q||!rate){toast("Every particular needs name, quantity and rate.");return}}
+ openInvoice();
+}
+function openInvoice(){
+ const rows=[...document.querySelectorAll(".billRow")].map(r=>({p:r.querySelector(".bPart").value.trim(),q:+r.querySelector(".bQty").value,rate:+r.querySelector(".bRate").value}));
+ if(!rows.length)rows.push({p:"Meher Silk Saree",q:20,rate:1850});
+ const subtotal=rows.reduce((s,x)=>s+x.q*x.rate,0),gstRate=+(document.getElementById("billGst")?.value||5),gst=subtotal*gstRate/100,total=subtotal+gst;
+ document.getElementById("ownerModal").innerHTML=`<h2>Invoice #INV-2841</h2><p>Fixed-format invoice preview</p><div class="invoice"><div class="invoiceTop"><div><h3>RAJVI TEXTILES</h3><div class="tiny">Ring Road, Surat · GSTIN 24ABCDE1234F1Z5</div></div><div class="tiny"><b>Tax Invoice</b><br>INV-2841 · 15 Sep 2026</div></div><div style="margin:14px 0;font-size:10px"><b>Bill To:</b> ${document.getElementById("billCustomer")?.value||"Meera Fashion"} · Surat</div><table><tr><th>#</th><th>Particulars</th><th>Qty</th><th>Rate</th><th>Amount</th></tr>${rows.map((x,i)=>`<tr><td>${i+1}</td><td>${x.p}</td><td>${x.q}</td><td>₹${x.rate.toLocaleString("en-IN")}</td><td>₹${(x.q*x.rate).toLocaleString("en-IN")}</td></tr>`).join("")}</table><div class="invoiceTotal"><div><span>Subtotal</span><b>₹${subtotal.toLocaleString("en-IN")}</b></div><div><span>GST ${gstRate}%</span><b>₹${gst.toLocaleString("en-IN")}</b></div><div class="grand"><span>Total</span><b>₹${total.toLocaleString("en-IN")}</b></div></div></div><div class="modalfoot" style="margin-top:15px"><button class="btn" onclick="closeOwnerModal()">Close</button><button class="btn" onclick="window.print()">Print / Save PDF</button><button class="btn primary" onclick="openOwnerModal('eway')">⚡ E-way Bill</button></div>`;
+ document.getElementById("ownerModalBack").style.display="flex";
+}
+
+/* client */
+function renderClientCategories(){const cats=["All","Sarees","Kurtis","Ethnic Wear","Dress Material","Fabrics"];document.getElementById("clientCats").innerHTML=cats.map(c=>`<button class="${c===selectedClientCategory?'active':''}" onclick="setClientCategory('${c}')">${c}</button>`).join("")}
+function setClientCategory(c){
+ selectedClientCategory=c;
+ localStorage.setItem("vastra_client_category",c);
+ renderClientCategories();renderClientProducts();
+}
+function renderClientProducts(){
+ const list=allProducts.filter(p=>selectedClientCategory==="All"||p.category===selectedClientCategory);
+ document.getElementById("clientProducts").innerHTML=list.map(p=>`<div class="clientProduct" data-id="${p.id}"><img src="${p.image}" alt="${p.name}" loading="lazy"><div class="body"><b>${p.name}</b><p>${p.description}</p><div class="bottom"><span class="price">₹${p.price.toLocaleString("en-IN")}</span><div class="qty"><button onclick="clientQty(this,-1)">−</button><span>${cart[p.id]||0}</span><button onclick="clientQty(this,1)">+</button></div></div></div></div>`).join("")}
+function startClientShop(){
+ const name=document.getElementById("clientName").value.trim(),phone=document.getElementById("clientPhone").value.trim(),city=document.getElementById("clientCity").value.trim();
+ if(!name||!phone){alert("Please enter your name and WhatsApp number.");return}
+ clientUser={name,phone,city};
+ localStorage.setItem("vastra_client_user",JSON.stringify(clientUser));
+ localStorage.setItem("vastra_view","client");
+ document.getElementById("clientGate").classList.add("hidden");document.getElementById("clientShop").classList.remove("hidden");renderClientCategories();renderClientProducts();
+}
+function clientQty(btn,d){
+ const id=+btn.closest(".clientProduct").dataset.id;let n=Math.max(0,(cart[id]||0)+d);if(n)cart[id]=n;else delete cart[id];
+ localStorage.setItem("vastra_cart",JSON.stringify(cart));
+ btn.parentElement.querySelector("span").textContent=n;updateCart();
+}
+function updateCart(){
+ let count=0,total=0;Object.entries(cart).forEach(([id,q])=>{let p=allProducts.find(x=>x.id===+id);if(p){count+=q;total+=q*p.price}});
+ document.getElementById("cartCount").textContent=count+" item"+(count===1?"":"s");document.getElementById("cartTotal").textContent="₹"+total.toLocaleString("en-IN");
+}
+function openCart(){
+ let out="",total=0;
+ Object.entries(cart).forEach(([id,q])=>{let p=allProducts.find(x=>x.id===+id);if(!p)return;let v=q*p.price;total+=v;out+=`<div class="line"><span>${p.name}<br><small>${q} × ₹${p.price.toLocaleString("en-IN")}</small></span><b>₹${v.toLocaleString("en-IN")}</b></div>`});
+ document.getElementById("cartLines").innerHTML=out||'<div style="padding:30px 0;color:#777;font-size:11px">Your cart is empty.</div>';document.getElementById("total2").textContent="₹"+total.toLocaleString("en-IN");document.getElementById("cartModal").classList.add("show");
+}
+function closeCart(){document.getElementById("cartModal").classList.remove("show")}
+function makeOrderPdf(order){
+ if(!window.jspdf?.jsPDF){return false}
+ const {jsPDF}=window.jspdf,doc=new jsPDF();
+ doc.setFontSize(22);doc.text("RAJVI TEXTILES",20,22);
+ doc.setFontSize(10);doc.text("Wholesale Textile Order Confirmation",20,29);
+ doc.line(20,34,190,34);
+ doc.setFontSize(11);doc.text("Order: "+order.id,20,45);doc.text("Date: "+order.date,20,52);
+ doc.text("Customer: "+order.name,20,61);doc.text("WhatsApp: "+order.phone,20,68);doc.text("City: "+(order.city||"—"),20,75);
+ let y=88;doc.setFontSize(10);doc.text("Product",20,y);doc.text("Qty",145,y);doc.text("Rate",162,y);doc.text("Amount",178,y);y+=7;doc.line(20,y,190,y);y+=7;
+ order.items.forEach(i=>{doc.text(i.name.substring(0,55),20,y);doc.text(String(i.qty),145,y);doc.text("₹"+i.price.toLocaleString("en-IN"),162,y);doc.text("₹"+(i.qty*i.price).toLocaleString("en-IN"),178,y);y+=7;if(y>270){doc.addPage();y=20}});
+ doc.line(120,y+2,190,y+2);doc.setFontSize(13);doc.text("TOTAL",145,y+12);doc.text("₹"+order.total.toLocaleString("en-IN"),175,y+12);
+ doc.setFontSize(9);doc.text("Please confirm availability, payment and dispatch details.",20,y+28);
+ doc.save(order.id+"-order.pdf");return true
+}
+function placeOrder(){
+ if(!Object.keys(cart).length){alert("Add at least one product.");return}
+ if(!clientUser.name||!clientUser.phone){alert("Please enter your details first.");closeCart();return}
+ const items=Object.entries(cart).map(([id,q])=>{let p=allProducts.find(x=>x.id===+id);return{name:p.name,qty:q,price:p.price}});
+ const total=items.reduce((s,i)=>s+i.qty*i.price,0);
+ const orders=getOrders();
+ const order={id:"ORD-"+(1049+orders.length),name:clientUser.name,phone:clientUser.phone,city:clientUser.city,date:new Date().toLocaleString("en-IN",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}),items,total,status:"New",source:"Client View"};
+ orders.unshift(order);saveOrders(orders);localStorage.setItem("vastra_orders",JSON.stringify(orders));
+ // The browser demo can open the owner's WhatsApp chat and generate the PDF, but WhatsApp does not allow a web page to silently attach/send a PDF. Production should use WhatsApp Business Cloud API/server-side media upload.
+ const msg=`New order received from Rajvi Textiles catalogue\\n\\nOrder: ${order.id}\\nCustomer: ${order.name}\\nWhatsApp: ${order.phone}\\nCity: ${order.city||"—"}\\n\\n`+items.map(i=>`${i.name} × ${i.qty} — ₹${(i.qty*i.price).toLocaleString("en-IN")}`).join("\\n")+`\\n\\nTotal: ₹${total.toLocaleString("en-IN")}\\nOrder PDF generated on this device.`;
+ const ownerChat="https://wa.me/"+OWNER_WHATSAPP+"?text="+encodeURIComponent(msg);
+ makeOrderPdf(order);
+ window.open(ownerChat,"_blank");
+ cart={};localStorage.setItem("vastra_cart",JSON.stringify(cart));updateCart();closeCart();renderClientProducts();renderOwnerOrders();toast("✓ Order added to Owner Orders + WhatsApp opened");
+}
+
+/* Save all current state before a browser refresh/navigation. */
+window.addEventListener("beforeunload",saveState);
+
+/* Always open the public entry screen when the demo link is opened. */
+showEntry();
+renderOwnerProducts();
+renderOwnerOrders();
+renderClientCategories();
+renderClientProducts();
+updateCart();
+</script>
+</body>
+</html>
